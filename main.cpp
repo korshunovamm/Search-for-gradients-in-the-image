@@ -102,6 +102,7 @@ void DrawGradient(std::vector<std::vector<int>>& new_data, Image& image,
 }
 
 int main() {
+  std::string input_path;
   std::cin >> input_path;
   Image image(input_path);
 
