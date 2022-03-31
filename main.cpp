@@ -1,4 +1,8 @@
 #include "main.h"
+#include <memory>
+#include <thread>
+#include <chrono>
+#include <mutex>
 
 Point operator+(const Point& point1, const Point& point2) {
   return {point1.x + point2.x, point1.y + point2.y};
@@ -76,9 +80,9 @@ void Image::CheckGradient(Point start_point, std::vector<std::vector<int>>& used
 
 std::vector<std::vector<int>> Image::Gradient() {
   std::vector<std::vector<int>> used(rows_, std::vector<int>(columns_, 0));
-  std::vector<std::vector<int>> new_data(columns_, std::vector<int>(rows_, 0));
-  for (int i = 0; i < columns_; ++i) {
-    for (int j = 0; j < rows_; ++j) {
+  std::vector<std::vector<int>> new_data(rows_, std::vector<int>(columns_, 0));
+  for (int i = 0; i < rows_; ++i) {
+    for (int j = 0; j < columns_; ++j) {
       if (!used[i][j]) {
         CheckGradient({i, j}, used, new_data);
       }
@@ -89,20 +93,20 @@ std::vector<std::vector<int>> Image::Gradient() {
 
 void DrawGradient(std::vector<std::vector<int>>& new_data, Image& image,
                   const std::string& output_path) {
+  Image& picture = image;
   int rows = image.GetRows();
   int columns = image.GetColumns();
-  unsigned char* img = image.GetImage();
   for (int i = 0; i < rows; ++i) {
     for (int j = 0; j < columns; ++j) {
-      *(img + (j + rows * i)) = new_data[i][j];
+      *(picture.GetImage() + (j + rows * i)) = new_data[i][j];
     }
   }
   int comp;
-  stbi_write_png(output_path.c_str(), rows, columns, comp, img, 1);
+  stbi_write_png(output_path.c_str(), rows, columns, comp, picture.GetImage(), 1);
 }
 
 int main() {
-  std::string input_path;
+  std::string input_path = "1C/gradient_colorful-1949265.jpg!d";
   std::cin >> input_path;
   Image image(input_path);
 
